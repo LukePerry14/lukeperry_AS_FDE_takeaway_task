@@ -94,7 +94,9 @@ Each LLM persona is served the question as a formatted prompt dependent on what 
 
 ## 5. Results + Analysis
 
-Results are from a full 100-persona run across 3 questions. WD is normalised by the ordinal scale range so scores are comparable across questions. The uniform distribution over answer options serves as an upper bound — any strategy above this is worse than random.
+Results are from a full 100-persona run across 3 questions and wasserstein distance is normalised by the ordinal scale range so scores are comparable across questions. Scores are reported as the output of a single run due to time constraints. The uniform distribution over answer options serves as an upper bound — any strategy above this is worse than random.
+
+The main takeaway is that backstory methods win on more abstract policy-belief questions, socialised QA wins on the harder sentiment question, and all four strategies comfortably beat the uniform ceiling across the board.
 
 ### INEQ5_i_W54
  
@@ -136,7 +138,7 @@ All models perform well under this paradigm, with distribution shapes largely ma
 | backstory | 0.0888 |
 | backstory_socialised | 0.1022 |
  
-Backstory methods dominate QS style demographic listing, implying that inclusion of motivating context for americans on lifestories might serve as better conditionals on beliefs for policy. Where for example working class americans often oppose wealth taxes due to implied violation of the principle of hard-work, something antithetical to what you might expect for lower income bracket citizens, something the demographic attribute itself might not capture.
+Backstory methods dominate QA style demographic listing, implying that inclusion of motivating context for americans on lifestories might serve as better conditionals on beliefs for policy. For example working class americans often oppose wealth taxes due to implied violation of the principle of hard-work, something antithetical to what you might expect for lower income bracket citizens, something the demographic attribute itself might not capture.
  
 ### ECON5_d_W54
  
@@ -159,7 +161,7 @@ Backstory methods dominate QS style demographic listing, implying that inclusion
 | backstory_socialised | 0.1245 |
 
 
-The lower scores on this question across all strategies implies this question is the hardest. However, despite this, the socialised QA style prompt shows a massive 28% improvement over second (backstory), with lots of this coming from a strong match in the dominant "hurting a lot" response option. I propose this is due to a movement of mass for personas representing more priveledged population tranches downwards.
+The lower scores on this question across all strategies implies this question is the hardest. However, despite this, the socialised QA style prompt shows a massive 28% improvement over second (backstory), with lots of this coming from a strong match in the dominant "hurting a lot" response option. I propose this is due to a movement of mass for personas representing more privileged population tranches downwards.
 
 
 
