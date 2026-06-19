@@ -1,0 +1,245 @@
+[
+  {
+    "qkey": "INEQ1_W54",
+    "question": "Thinking about the level of economic inequality in the country these days, would you say there is",
+    "options": [
+      "Too much economic inequality",
+      "Too little economic inequality",
+      "About the right amount of economic inequality",
+      "Refused"
+    ],
+    "responses": [
+      0.62423848,
+      0.1355498,
+      0.24021173
+    ],
+    "ordinal": [
+      1.0,
+      2.0,
+      1.5
+    ],
+    "refusal_rate": 0.0272823031387124
+  },
+  {
+    "qkey": "INEQ5_h_W54",
+    "question": "How much, if at all, do you think the different life choices people make contributes to economic inequality in this country?",
+    "options": [
+      "Contributes a great deal",
+      "Contributes a fair amount",
+      "Contributes not too much",
+      "Contributes not at all",
+      "Refused"
+    ],
+    "responses": [
+      0.42541969,
+      0.36232314,
+      0.161085,
+      0.05117217
+    ],
+    "ordinal": [
+      1.0,
+      2.0,
+      3.0,
+      4.0
+    ],
+    "refusal_rate": 0.0103130819159308
+  },
+  {
+    "qkey": "INEQ5_i_W54",
+    "question": "How much, if at all, do you think some people starting out with more opportunities than others contributes to economic inequality in this country?",
+    "options": [
+      "Contributes a great deal",
+      "Contributes a fair amount",
+      "Contributes not too much",
+      "Contributes not at all",
+      "Refused"
+    ],
+    "responses": [
+      0.39884151,
+      0.37801558,
+      0.17130858,
+      0.05183432
+    ],
+    "ordinal": [
+      1.0,
+      2.0,
+      3.0,
+      4.0
+    ],
+    "refusal_rate": 0.0091291403209726
+  },
+  {
+    "qkey": "INEQ8_c_W54",
+    "question": "How much, if at all, do you think the following proposals would do to reduce economic inequality in the U.S.? Increasing taxes on the wealthiest Americans",
+    "options": [
+      "A great deal",
+      "A fair amount",
+      "Not too much",
+      "Nothing at all",
+      "Refused"
+    ],
+    "responses": [
+      0.46455801,
+      0.24433181,
+      0.18119095,
+      0.10991923
+    ],
+    "ordinal": [
+      1.0,
+      2.0,
+      3.0,
+      4.0
+    ],
+    "refusal_rate": 0.0049152354341058
+  },
+  {
+    "qkey": "INEQ8_d_W54",
+    "question": "How much, if at all, do you think the following proposals would do to reduce economic inequality in the U.S.? Expanding Medicare so that it covers Americans of all ages",
+    "options": [
+      "A great deal",
+      "A fair amount",
+      "Not too much",
+      "Nothing at all",
+      "Refused"
+    ],
+    "responses": [
+      0.41127742,
+      0.26615929,
+      0.18021839,
+      0.1423449
+    ],
+    "ordinal": [
+      1.0,
+      2.0,
+      3.0,
+      4.0
+    ],
+    "refusal_rate": 0.006676809152258
+  },
+  {
+    "qkey": "INEQ4_a_W54",
+    "question": "How much responsibility, if any, should the federal government have in reducing economic inequality in our country?",
+    "options": [
+      "A lot",
+      "Some",
+      "Only a little",
+      "None",
+      "Refused"
+    ],
+    "responses": [
+      0.67434773,
+      0.27478496,
+      0.05086732,
+      0.0
+    ],
+    "ordinal": [
+      1.0,
+      2.0,
+      3.0,
+      4.0
+    ],
+    "refusal_rate": 0.0031961774450931
+  },
+  {
+    "qkey": "ECON5_d_W54",
+    "question": "Do you think the country's current economic conditions are helping or hurting people who are poor?",
+    "options": [
+      "Helping a lot",
+      "Helping a little",
+      "Hurting a little",
+      "Hurting a lot",
+      "Neither helping nor hurting",
+      "Refused"
+    ],
+    "responses": [
+      0.10722008,
+      0.16175169,
+      0.14292535,
+      0.50649474,
+      0.08160814
+    ],
+    "ordinal": [
+      1.0,
+      2.0,
+      3.0,
+      4.0,
+      2.5
+    ],
+    "refusal_rate": 0.0106198022500867
+  },
+  {
+    "qkey": "FIN_SIT_W54",
+    "question": "How would you describe your household's financial situation?",
+    "options": [
+      "Live comfortably",
+      "Meet your basic expenses with a little left over for extras",
+      "Just meet your basic expenses",
+      "Don't even have enough to meet basic expenses",
+      "Refused"
+    ],
+    "responses": [
+      0.29382912,
+      0.41585063,
+      0.22021879,
+      0.07010146
+    ],
+    "ordinal": [
+      1.0,
+      2.0,
+      3.0,
+      4.0
+    ],
+    "refusal_rate": 0.0023534799377576
+  },
+  {
+    "qkey": "WORRY2c_W54",
+    "question": "How often, if ever, do you worry about paying your bills?",
+    "options": [
+      "Every day",
+      "Almost every day",
+      "Sometimes",
+      "Rarely",
+      "Never",
+      "Refused"
+    ],
+    "responses": [
+      0.24822085,
+      0.16081373,
+      0.28056356,
+      0.18565082,
+      0.12475104
+    ],
+    "ordinal": [
+      1.0,
+      2.0,
+      3.0,
+      4.0,
+      5.0
+    ],
+    "refusal_rate": 0.008787481935968
+  },
+  {
+    "qkey": "GOVPRIORITYc_W54",
+    "question": "How much of a priority should the following be for the federal government to address: Reducing economic inequality",
+    "options": [
+      "A top priority",
+      "Important, but lower priority",
+      "Not too important",
+      "Should not be done",
+      "Refused"
+    ],
+    "responses": [
+      0.42888565,
+      0.37001517,
+      0.13708222,
+      0.06401696
+    ],
+    "ordinal": [
+      1.0,
+      2.0,
+      3.0,
+      4.0
+    ],
+    "refusal_rate": 0.0097905366406204
+  }
+]

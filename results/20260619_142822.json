@@ -1,0 +1,189 @@
+{
+  "INEQ5_i_W54": {
+    "question": "How much, if at all, do you think some people starting out with more opportunities than others contributes to economic inequality in this country?",
+    "options": [
+      "Contributes a great deal",
+      "Contributes a fair amount",
+      "Contributes not too much",
+      "Contributes not at all"
+    ],
+    "ground_truth": [
+      0.39884151,
+      0.37801558,
+      0.17130858,
+      0.05183432
+    ],
+    "uniform_upper_bound": {
+      "wd": 0.20795476374621424,
+      "distribution": [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ]
+    },
+    "baseline": {
+      "wd": 0.025905201094286585,
+      "distribution": [
+        0.4348727335044004,
+        0.3672424241144759,
+        0.16247684577934948,
+        0.035407996601774155
+      ]
+    },
+    "socialised": {
+      "wd": 0.03621014871229381,
+      "distribution": [
+        0.44922030861062184,
+        0.3730204447329026,
+        0.13879292207785135,
+        0.03896632457862329
+      ]
+    },
+    "backstory": {
+      "wd": 0.01140875889184654,
+      "distribution": [
+        0.3925697924335927,
+        0.3667097212646055,
+        0.19926313683380303,
+        0.041457349467998755
+      ]
+    },
+    "backstory_socialised": {
+      "wd": 0.018384467433833356,
+      "distribution": [
+        0.4237723646623966,
+        0.3610348267216025,
+        0.18563094610974726,
+        0.029561862506253273
+      ]
+    }
+  },
+  "INEQ8_c_W54": {
+    "question": "How much, if at all, do you think the following proposals would do to reduce economic inequality in the U.S.? Increasing taxes on the wealthiest Americans",
+    "options": [
+      "A great deal",
+      "A fair amount",
+      "Not too much",
+      "Nothing at all"
+    ],
+    "ground_truth": [
+      0.46455801,
+      0.24433181,
+      0.18119095,
+      0.10991923
+    ],
+    "uniform_upper_bound": {
+      "wd": 0.18784286666666664,
+      "distribution": [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ]
+    },
+    "baseline": {
+      "wd": 0.11417655463374264,
+      "distribution": [
+        0.5573740548765782,
+        0.32487614220125444,
+        0.08418381486898399,
+        0.033565988053183254
+      ]
+    },
+    "socialised": {
+      "wd": 0.11204969429263768,
+      "distribution": [
+        0.562886995016456,
+        0.31786972221616955,
+        0.07527725339620478,
+        0.04396602937116919
+      ]
+    },
+    "backstory": {
+      "wd": 0.07062212222510515,
+      "distribution": [
+        0.48359769155111354,
+        0.3560408715454279,
+        0.1125201489311181,
+        0.04784128797234006
+      ]
+    },
+    "backstory_socialised": {
+      "wd": 0.07510763022021243,
+      "distribution": [
+        0.49123259118009377,
+        0.3517664100296935,
+        0.11162089706096819,
+        0.04538010172924425
+      ]
+    }
+  },
+  "ECON5_d_W54": {
+    "question": "Do you think the country's current economic conditions are helping or hurting people who are poor?",
+    "options": [
+      "Helping a lot",
+      "Helping a little",
+      "Hurting a little",
+      "Hurting a lot",
+      "Neither helping nor hurting"
+    ],
+    "ground_truth": [
+      0.10722008,
+      0.16175169,
+      0.14292535,
+      0.50649474,
+      0.08160814
+    ],
+    "uniform_upper_bound": {
+      "wd": 0.1964996066666667,
+      "distribution": [
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ]
+    },
+    "baseline": {
+      "wd": 0.10401802608776693,
+      "distribution": [
+        0.03913978968596179,
+        0.14949247542249045,
+        0.3568029148225635,
+        0.3127642338155858,
+        0.1418005862533983
+      ]
+    },
+    "socialised": {
+      "wd": 0.10314045169944226,
+      "distribution": [
+        0.03253609248289474,
+        0.1396711496418277,
+        0.3585103882671335,
+        0.3493695709799678,
+        0.11991279862817608
+      ]
+    },
+    "backstory": {
+      "wd": 0.10680189253146925,
+      "distribution": [
+        0.04408968829597454,
+        0.12207910949114482,
+        0.38609581190976106,
+        0.33791760234187707,
+        0.1098177879612423
+      ]
+    },
+    "backstory_socialised": {
+      "wd": 0.1011487466456275,
+      "distribution": [
+        0.04708673775910403,
+        0.13224170656418105,
+        0.37602752490121055,
+        0.3426144451859524,
+        0.10202958558955155
+      ]
+    }
+  }
+}

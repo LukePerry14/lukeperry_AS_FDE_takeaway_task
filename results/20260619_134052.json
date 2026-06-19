@@ -1,0 +1,189 @@
+{
+  "INEQ5_i_W54": {
+    "question": "How much, if at all, do you think some people starting out with more opportunities than others contributes to economic inequality in this country?",
+    "options": [
+      "Contributes a great deal",
+      "Contributes a fair amount",
+      "Contributes not too much",
+      "Contributes not at all"
+    ],
+    "ground_truth": [
+      0.39884151,
+      0.37801558,
+      0.17130858,
+      0.05183432
+    ],
+    "uniform_upper_bound": {
+      "wd": 0.20795476374621424,
+      "distribution": [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ]
+    },
+    "baseline": {
+      "wd": 0.02128809707954758,
+      "distribution": [
+        0.39,
+        0.37,
+        0.15,
+        0.09
+      ]
+    },
+    "socialised": {
+      "wd": 0.03537856958711912,
+      "distribution": [
+        0.44,
+        0.39,
+        0.13,
+        0.04
+      ]
+    },
+    "backstory": {
+      "wd": 0.036616634766166355,
+      "distribution": [
+        0.42,
+        0.28,
+        0.26,
+        0.04
+      ]
+    },
+    "backstory_socialised": {
+      "wd": 0.028711902920452375,
+      "distribution": [
+        0.42,
+        0.41,
+        0.13,
+        0.04
+      ]
+    }
+  },
+  "INEQ8_c_W54": {
+    "question": "How much, if at all, do you think the following proposals would do to reduce economic inequality in the U.S.? Increasing taxes on the wealthiest Americans",
+    "options": [
+      "A great deal",
+      "A fair amount",
+      "Not too much",
+      "Nothing at all"
+    ],
+    "ground_truth": [
+      0.46455801,
+      0.24433181,
+      0.18119095,
+      0.10991923
+    ],
+    "uniform_upper_bound": {
+      "wd": 0.18784286666666664,
+      "distribution": [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ]
+    },
+    "baseline": {
+      "wd": 0.11215713333333342,
+      "distribution": [
+        0.56,
+        0.3,
+        0.12,
+        0.02
+      ]
+    },
+    "socialised": {
+      "wd": 0.12882380000000007,
+      "distribution": [
+        0.56,
+        0.36,
+        0.05,
+        0.03
+      ]
+    },
+    "backstory": {
+      "wd": 0.08882380000000001,
+      "distribution": [
+        0.47,
+        0.42,
+        0.08,
+        0.03
+      ]
+    },
+    "backstory_socialised": {
+      "wd": 0.10215713333333341,
+      "distribution": [
+        0.53,
+        0.32,
+        0.14,
+        0.01
+      ]
+    }
+  },
+  "ECON5_d_W54": {
+    "question": "Do you think the country's current economic conditions are helping or hurting people who are poor?",
+    "options": [
+      "Helping a lot",
+      "Helping a little",
+      "Hurting a little",
+      "Hurting a lot",
+      "Neither helping nor hurting"
+    ],
+    "ground_truth": [
+      0.10722008,
+      0.16175169,
+      0.14292535,
+      0.50649474,
+      0.08160814
+    ],
+    "uniform_upper_bound": {
+      "wd": 0.1964996066666667,
+      "distribution": [
+        0.2,
+        0.2,
+        0.2,
+        0.2,
+        0.2
+      ]
+    },
+    "baseline": {
+      "wd": 0.12616355333333332,
+      "distribution": [
+        0.01,
+        0.15,
+        0.39,
+        0.3,
+        0.15
+      ]
+    },
+    "socialised": {
+      "wd": 0.08783022000000003,
+      "distribution": [
+        0.04,
+        0.15,
+        0.34,
+        0.39,
+        0.08
+      ]
+    },
+    "backstory": {
+      "wd": 0.11283021999999998,
+      "distribution": [
+        0.06,
+        0.14,
+        0.43,
+        0.28,
+        0.09
+      ]
+    },
+    "backstory_socialised": {
+      "wd": 0.12449688666666665,
+      "distribution": [
+        0.04,
+        0.1,
+        0.45,
+        0.33,
+        0.08
+      ]
+    }
+  }
+}
