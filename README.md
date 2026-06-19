@@ -96,7 +96,7 @@ Each LLM persona is served the question as a formatted prompt dependent on what 
 
 Results are from a full 100-persona run across 3 questions and wasserstein distance is normalised by the ordinal scale range so scores are comparable across questions. Scores are reported as the output of a single run due to time constraints. The uniform distribution over answer options serves as an upper bound — any strategy above this is worse than random.
 
-The main takeaway is that backstory methods win on more abstract policy-belief questions, socialised QA wins on the harder sentiment question, and all four strategies comfortably beat the uniform ceiling across the board.
+The main takeaway is that results are mixed, no clear winners emerge, and while performance differences can be stark, it is unclear whether this is due to natural performance variance over runs. The presence of only a single datapoint for each strategy and question makes in depth and cross-strategy evaluation difficult, this is an unfortunate consequence of my limited compute and time. Despite this, it appears that backstory methods win on more abstract policy-belief questions, and socialised QA wins on the harder sentiment question by blending opinions of demographics. It is worth pointing out that all four strategies comfortably beat the uniform ceiling across the board.
 
 ### INEQ5_i_W54
  
@@ -117,7 +117,7 @@ The main takeaway is that backstory methods win on more abstract policy-belief q
 | backstory | 0.0366 |
 | backstory_socialised | 0.0287 |
  
-All models perform well under this paradigm, with distribution shapes largely matching under all strategies, and significant improvement against baselines. Interestingly, backstory socialiased and the demographic listing baseline were the top performers here, showing no clear correlation between strategies and performance, implying all tasks perform well enough to capture ground truth up to baseline sampling noise and these differences between strategies might disappear over multiple runs (which I did not have time for). The only exception here is overconfidence on the backstory strategy for the 'contributes not too much option', where synthetic background context may be overpowering demographic information. 
+All models perform well under this paradigm, with distribution shapes largely matching under all strategies, and significant improvement against baselines. Interestingly, backstory_socialiased and the demographic listing baseline were the top performers here, showing no clear correlation between strategies and performance, implying all tasks perform well enough to capture ground truth up to baseline sampling noise and these differences between strategies might disappear over multiple runs (which I did not have time for). The only exception here is overconfidence on the backstory strategy for the 'contributes not too much option', where synthetic background context may be overpowering demographic information. 
 
 ### INEQ8_c_W54
  
@@ -161,7 +161,7 @@ Backstory methods dominate QA style demographic listing, implying that inclusion
 | backstory_socialised | 0.1245 |
 
 
-The lower scores on this question across all strategies implies this question is the hardest. However, despite this, the socialised QA style prompt shows a massive 28% improvement over second (backstory), with lots of this coming from a strong match in the dominant "hurting a lot" response option. I propose this is due to a movement of mass for personas representing more privileged population tranches downwards.
+The lower scores on this question across all strategies implies this question is the hardest. However, despite this, the socialised QA style prompt shows a 28% improvement over second (backstory), with lots of this coming from a strong match in the dominant "hurting a lot" response option. This might be due to a movement of mass for personas representing more privileged population tranches downwards, where the model might otherwise predict they are upset with excessive welfare spending.
 
 
 
