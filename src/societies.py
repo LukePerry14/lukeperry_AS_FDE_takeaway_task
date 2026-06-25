@@ -72,10 +72,7 @@ class Society:
 
         # Mean probability per option across all 100 personas
         if tranches:
-            agg = [
-                sum(r[opt] for r in person_responses) / len(person_responses)
-                for opt in options
-            ]
+            agg = [sum(r[opt] for r in person_responses) / len(person_responses) for opt in options]
         else:  # sample a discrete answer per person, generate distribution from these answers
             answers = [np.random.choice(options, p=np.array([r[opt] for opt in options])) for r in person_responses]
             agg = [answers.count(opt) / len(answers) for opt in options]

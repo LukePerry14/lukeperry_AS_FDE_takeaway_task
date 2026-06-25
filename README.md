@@ -10,7 +10,7 @@ This repository is organized as follows:
 - `model_handling.py` — LLM wrapper classes for survey response and backstory generation.
 - `societies.py` — Persona and society orchestration, including demographic data handling, adjacency, and evaluation.
 - `steering_prompts.json` — Demographic steering prompts for LLM persona generation.
-- `w54_selected.json` — Subset of selected Wave 54 survey questions used for evaluation.
+- `w54_selected.json` — Subset of eval questions - Wave 54: covering economics and inequality.
 
 Other files
 - `README.md` — Internal codebase manual and project report.
@@ -22,9 +22,7 @@ Other files
 This will be a semi-formal walkthrough of my thinking and findings. Many decisions are based on the wording of the task prompt, and as such it is listed below for reference:
 
 ---
-We’d love for you to build 100 <mark>LLM personas modelling one group of humans </mark>, and ask them a <mark>few single-select survey questions</mark> around a market research topic of your choosing. Your goal is to come up with <mark>different</mark> methods of creating / modelling personas using LLMs, so that they produce results that <mark>capture the human group’s opinions as much as possible</mark>, and present your findings and methods to the team.
-
- 
+We’d love for you to build <mark>100 LLM personas modelling one group of humans</mark>, and ask them a <mark>few single-select survey questions</mark> around a market research topic of your choosing. Your goal is to come up with <mark>different methods of creating / modelling personas using LLMs</mark>, so that they produce results that <mark>capture the human group’s opinions as much as possible</mark>, and present your findings and methods to the team.
 
 We have left this problem intentionally vague - we’d love to see is how you formulate the problem, define objectives, and how creative you are at using LLMs to achieve your goals with first-principled intuitions in mind, and presenting your findings within an overall narrative.
 
@@ -33,54 +31,84 @@ We have left this problem intentionally vague - we’d love to see is how you fo
 
 ## 0. Research
 
-Before beginning any implementation, I did some research on LLMs for survey response, and LLM persona generation. The papers I found to be most relevant and therefore spent the most time reading were (in order of significance):
+Before beginning any implementation, I did some research on LLM persona generation and existing attempts to use LLMs for survey simulations. The papers I found to be most relevant and therefore spent the most time reading were (in order of significance):
 
 1. "Language Model Fine-Tuning on Scaled Survey Data for Predicting Distributions of Public Opinions" — *fine tuning LLMs for survey response simulation*
-2. "Virtual Personas for Language Models via an Anthology of Backstories" — *best practice persona generation for accurate human respondant simulation*
-3. "Graph-Based Alternatives to LLMs for Human Simulation" — *GNNs (no LLMs) for survey response simulation*
+2. "Virtual Personas for Language Models via an Anthology of Backstories" — *best practice persona generation for accurate simulation of survey respondants*
+3. "Graph-Based Alternatives to LLMs for Human Simulation" — *GNNs (not LLMs) for survey response simulation based on social network structure*
 
-These provide a strong academic base for the training of LLM models for survey response, persona generation theory for survey response, and social network theory in survey response respectively. I also researched different potential survey datasets to use to ensure my results and quantifications, rather than qualitative assertions. the two primary daataset candidates I found were:
+These provide a strong academic base for: the training of LLM models for survey response, persona generation theory for survey response, and social network theory in survey responses respectively. I also explored different potential datasets I could use. A satisfactory dataset would need to interface natively with out of the box LLMs for ease of development, provide persona generation priors (e.g. survey respondant demographic info), and have survey response ground truths compatible with 100 persona responses. The two primary candidates that stood out were:
 
 - Pew ATP(as used in paper 1)
 - Twin-2k-500
 
-These datasets differ primarily in the priors they use to imply persona. Pew ATP uses demographic flags to indiciate subpopulation membership, whereas Twin-2k-500 uses incredibly long context persona texts as concatenations of QA responses for a specific respondant. While the Twin-2k-500 dataset is interesting as it enables complex persona generation strategies such as RAG, or RLHF, due to time limitations, I decided to use the Pew ATP dataset.
+These datasets differ primarily in the priors they use for persona generation. Pew ATP uses a collection demographic flags to indiciate subpopulation membership (e.g. race, income, political idealogy etc.), whereas Twin-2k-500 represents each individual by an extensive pool of Q&A responses. While the Twin-2k-500 dataset is interesting as it enables complex persona generation strategies such as RAG, or RLHF, using a larger data corpus to imply persona perferences and opinions - due to time limitations, I decided to use the simpler Pew ATP dataset, which provides a much simpler basis for persona generation.
 
 ## 1. Problem Framing
 
-My problem framing draws from the methodology in paper 1. I chose to use an economics based question subset from the eval split. Persona priors are based on the intersection of the Pew ATP attributes: Income, Race, and Age. These were selected as they are known variance drivers on opinions regarding economics and inequality, and the product of the options for these attributes is exactly 100. As a simplifying assumption, I ignore any sampling required to make the 100 personas follow the same distribution over these demographic attributes as the american public. Each persona can therefore be seen as a population tranche for that intersection of attributes. I propose this is a reasonable assumption for a stratified survey a market researcher might take.
+My problem framing draws from the methodology in paper 1.
 
-The task is therefore to experiment with persona generation strategies to minimise the wasserstein distance between answers generated by these personas and the actual overall answer distribution for each question.
+The Pew ATP dataset provides an "OVERALL" response distribution for each question, representing the aggregation of responses over the entire population. The dataset also includes conditional response distributions based on responses from a single demographic subset (e.g. republican, income > $100000, etc.). However, since I treat each persona as an intersection over multiple traits, there is no ground truth response for each individual persona response distribution. In order to ensure each persona is different, and that a ground truth is available for the aggregated responses over all personas, I define each persona as the unique combination of demographic attribute priors over the INCOME, AGE, and RACE categories. These were selected as they are known axes for variance in opinion as it relates to the economic inequality, and the cartesian product of these options creates exactly 100 unique triplets. The options for each demographic attribute are as follows:
+
+```
+INCOME = ["Less than $30,000", "$30,000-$50,000", "$50,000-$75,000", "$75,000-$100,000", "$100,000 or more"]
+AGE = ["18-29", "30-49", "50-64", "65+"]
+RACE = ["White", "Black", "Hispanic", "Asian", "Other"]
+```
+
+As each persona in a unique population tranche along these three axes, this allows the overall persona generation performance to be measured against the OVERALL response distribution. I propose that this is not only experimentally convenient, but actually acts as a reasonable parallel to a stratified market research survey, where the survey coordinator would aim to select survey constituents such that they form a a diverse - and ideally comprehensive - population sample.
+
+The objective function therefore becomes the minimisation of wasserstein distance between generated survey responses over all 100 personas and the ground truth OVERALL distribution - I test 4 different prompt engineering based persona generation strategies, comparing performance using the wasserstein distance metric, along with a uniform response distribution baseline.
 
 ## 2. Model Selection
 
-There are 3 key considerations for model selection:
+There are 4 key considerations for model selection:
 
-1. **size**: I need to be able to run these models locally as this will save on project implementation time and experimenation time, crucial considering the 48 hour restriction
-2. **intelligence/suitability**: use of an appropriately sophisticated model which is trained for persona adoption will maximise task performance
-3. **Base vs Instruct**: As noted in both papers 1 and 2, the SFT and RLHF processes that create instruct models creates significant overconfidence and biasing, making them unsuitable for actual question answering, making base model preferrable.
+1. **Size**: Models need to be of a reasonable size such that I can run them on my local hardware for implementation and experimentation convenience.
+2. **Intelligence**: Use of an appropriately intelligent model trained on a sufficiently large dataset including opinion information will be imperative for performance maximisation. Moreover, models specialised for these tasks will also provide performance boosts.
+3. **Base vs Instruct**: As noted in both papers 1 and 2, the SFT and RLHF processes that create instruct models creates significant overconfidence and biasing when generating responses to survey questions. This makes base models more suitable for synthetic surveying tasks.
+4. **Task**: While base models are preferable for actual survey response, paper 2 reports that instruct models are actually superior for backstory generation.
 
-As the LoRa weights for the fine tuned models used in paper 1 are publically available, I chose to use the best performing small model in this paper loaded with the associated LoRa adapter - Mistral-7B-v0.1. This isn't a conflict issue as the task is very similar to that defined in the paper, but I am varying the persona generation strategy, not any fine-tuning method.
+Paper 1 has made the LoRa weights for their finetuned models publically available. I therefore elect to use the best performing small model from paper 1 loaded with the associated LoRa adapter - Mistral-7B-v0.1. It is worth pointing out that the task this model was trained for is very similar to this project brief, where the key difference is in the focus of this project on the persona generation strategy, not any fine-tuning method.
 
-As I also use a backstory based persona generation method, following the findings of paper 2 that instruct models are better suited to demographic conditioned backstory generation, I chose to use Qwen3-8B instruct model for this task. This model achieves state of the art performance across a variety of tasks, and is sufficiently small to run quickly on my machine.
+As I also use a backstory based persona generation method, following the findings of paper 2 that instruct models are better suited to demographic conditioned backstory generation, I substitute the mistral base model for Qwen3-8B model for this generation. I chose this model as it achieves state of the art performance across a variety of tasks, and is sufficiently small to run quickly on my machine.
 
 ## 3. Persona Generation
 
-I found or thought of multiple different persona modelling strategies, covering:
+My thoughts for what to target when looking at persona generation strategies fell broadly into the following categories:
 
-- **Persona Target**: LLM personas are traditionally thought of as a single person of some description, in a survey context this would be a survey respondent. However, a more hierarchical model could be used to model a archetype of person, or otherwise collection of people.
+- **Persona Target**: LLM personas are traditionally thought of as a single person following some role or having some collection of traits - in a survey context this is be a survey respondent. However, a more hierarchical model could be used to model a archetype of person, or otherwise collection of people, before being more specific or personal when actually creating an instance of a person from that archetype. For example, first modelling a person by their demographic information, then generating a personal backstory conditioned on this information.
 
-- **Persona Priors**: The priors that you use to condition your persona generation can come from a variety of sources depending on what you assume to cause the most variance from the unconditioned population: demographics attributes, schwartz's values, big five traits, or political compass scores. Moreover, use of large corpuses could be used with RAG to allow relevant opinions to be used as context for appropriate questions.
+- **Persona Priors**: The traits that that you select to condition your persona generation can come from a variety of sources depending on what you assume to be the most consequential to response variance. These priors act as conditionals which change the models performance from an unconditioned base state, and are ideally are selected to produce the largest variance from baseline such that this variance modifies output response distribution to more closely match a target distribution. Examples of what these persona priors could be include: demographic attributes, schwartz's values, big five traits, or political compass scores. Desirable traits are as simple as possible, and change model responses from baseline to more closely match a target distribution. While these traits are commonly prepended to the survey question to steer the model output, the Twin-2k-500 dataset instead allows collections of responses to create a much larger unstructured cloud of datapoints which represent a person's beliefs and preferences. This format lends itself to a RAG based persona generation strategy.
 
-- **Persona Networks**: Your social network has an undeniable effect on your opinions, including the opinions and personas of simulated social neighbours can therefore contribute to survey responses.
+- **Persona Networks**: Your social network has an undeniable effect on your beliefs and worldview. I am most interested in exploring the inclusion of peers' personas and beliefs within a simulated network as an additional conditional on potential survey responses. personas act as natural candidates for nodes on social networks, where different edge existences and weights could be used to create a simulation, where ideas are shared among communities. Personas could discuss questions before responding, or a simpler approach simply includes the information of selected peers in backstory generation or QA responses.
 
-- **Real vs Synthetic**: Intuitively, real data from real people grounds your conditioning in a way that makes it more likely to be representative of reality. However, synthetic generation, such as in the form of creation of a full backstory might provide plausible additional context that conditions an LLMs response in a way that enriches responses
+- **Real vs Synthetic**: Intuitively, real data from real people grounds your conditioning in a way that makes it more likely to be representative of reality. However, synthetic generation, such as in the form of creation of a full backstory might provide plausible additional context which is otherwise unavailable that conditions an LLMs response in a way that enriches responses.
 
-- **Static vs Moulded**: single personas generated in a static way are effective in literature. However, LLMs often develop and mould their personalities with increased context. A full conversation with a model with adversarial or helpful questioning might help to generate a more rounded persona.
+- **Static vs Moulded**: Single personas generated in a static way have been demonstrated as effective in literature. However, techniques exist in LLM literature which posit that human discussion with an LLM persona often help to develop and mould their personalities to be stronger, and more rounded. This is achieved by a human engineer including guiding or adversarial LLM beliefs through prompting as part of a conversation chain.
 
 
-Based on the limited time frame, I decided to test standard demographic listing alongside backstory generation. I also include for both methods a "socialised" variant. This variant creates an edge weighted social network over personas by calculating similarity scores (implemented as distances) between latent vectors of demographic information. Where the ordinality of AGE and INCOME can be used as a euclidean distance, and RACE can be included as a hamming distance. Two peers' demographic information is then chosen via weighted sampling using these similarity scores in either the QA style prompt for demographic listing, or in the prompt for the natural language backstory generation. The four experiments are then
+Based on the limited time frame, I decided to focus on prompting engineering based persona generation strategies. I decided that I would include a simple Q&A style prompt which both establishes demographic attributes and guides the model towards a letter response, I would then also include a generated backstory based on demographic information, which is prepended to the survey question. For both of these generation stratgies, I also include a socialised variant which includes the information of two randomly sampled peers selected with probability propotional to the demographic similarity between the personas. The information of selected peers is then either included in the Q&A prompt, or is included in the prompt for generating the persona backstory.
 
+Demographic similarity is calculated based on the distance in the latent space representations of persona demographic information. This distance is then passed through a logistic function to create a similarity score between 0 and 1.
+
+$$
+\text{similarity}(i, j) = \frac{1}{1 + e^{3(d_{tot} - 0.84)}}
+$$
+
+where each pairwise distance component is scaled so that the average distance along that axis equals 1:
+
+$$
+d_{\text{inc}} = |l_i^{\text{inc}} - l_j^{\text{inc}}| \times 2, \quad d_{\text{age}} = |l_i^{\text{age}} - l_j^{\text{age}}| \times 1.8, \quad d_{\text{race}} = \begin{cases} 0 & \text{if } l_i^{\text{race}} = l_j^{\text{race}} \\ 1.25 & \text{otherwise} \end{cases}
+$$
+
+$$
+d_{tot} = \frac{d_{\text{inc}} + d_{\text{age}} + d_{\text{race}}}{3}
+$$
+
+Latent coordinates $l^{\text{inc}}, l^{\text{age}} \in [0, 1]$ are obtained by normalising the ordinal value associated with the demographic membership with the maximum ordinal value for each demographic option (e.g. $l^{\text{inc}} = \text{index(income band)} / (K-1)$ for $K$ income bands). $l^{\text{race}}$ is a categorical comparison calculated as hamming weight. The scaling factors (2, 1.8, 1.25) are chosen so that the expected distance between two randomly drawn individuals is approximately 1 along each axis, making $d_{tot}$ a normalised composite similarity (where smaller latent distances correspond to higher similarity). The sigmoid is centred at $d_{tot} = 0.84$, these values where arrived at empirically as they appeared to produce plausible similarities.
+
+The four tested persona generation strategies are:
 - basic demographic listing in QA format
 - demographic listing in QA format with demographic listing of peers
 - synthetic backstory generation using demographic information
@@ -89,14 +117,19 @@ Based on the limited time frame, I decided to test standard demographic listing 
 
 ## 4. Evaluation Setup
 
-Each LLM persona is served the question as a formatted prompt dependent on what strategy is being used, the token logits associated with each answer are then extracted and softmaxed to produce the probability distribution which is then stored. At this point there is an option to treat each distribution as an abstract tranche, but I instead sample an answer from each persona, treating each persona as an actual example of a survey respondent from that demographic background. The distribution of these answers is then compared against the baseline from the actual american public using the associated ordinality values, and a wasserstein distance metric is calculated.
+After the prompt has been passed to the Mistral model, the probability weights tokens associated with the single letter responses are extracted. These weights are then passed through a softmax function to create a probability distribution over the response options. This raw probability distribution is then sampled per persona to simulate the persona responding as a specific member of that population tranche. The overall distribution of responses over the entire persona population is then compared against the ground truth. The wasserstein distance between these distributions is then used as the measure of performance. The wasserstein distance is calculated as:
 
+$$
+W = \frac{\sum_i \left| CDF_{\text{gt}}(x_i) - CDF_{\text{agg}}(x_i) \right| \cdot \Delta x_i}{\text{ordinal}_{\max} - \text{ordinal}_{\min}}
+$$
+
+where $CDF_{\text{gt}}(x_i)$ and $CDF_{\text{agg}}(x_i)$ are the cumulative probabilities up to and including response option $i$ for the ground truth and aggregated persona distributions respectively, and $\Delta x_i$ is the gap between consecutive response values.
 
 ## 5. Results + Analysis
 
 Results are from a full 100-persona run across 3 questions and wasserstein distance is normalised by the ordinal scale range so scores are comparable across questions. Scores are reported as the output of a single run due to time constraints. The uniform distribution over answer options serves as an upper bound — any strategy above this is worse than random.
 
-The main takeaway is that results are mixed, no clear winners emerge, and while performance differences can be stark, it is unclear whether this is due to natural performance variance over runs. The presence of only a single datapoint for each strategy and question makes in depth and cross-strategy evaluation difficult, this is an unfortunate consequence of my limited compute and time. Despite this, it appears that backstory methods win on more abstract policy-belief questions, and socialised QA wins on the harder sentiment question by blending opinions of demographics. It is worth pointing out that all four strategies comfortably beat the uniform ceiling across the board.
+The main takeaway is that results are mixed, no clear winners emerge, and while performance differences can be stark, it is unclear whether this is due to persona generation differences or natural performance variance over runs. The presence of only a single datapoint for each strategy and question makes in depth and cross-strategy evaluation difficult, this is an unfortunate consequence of my limited compute and time. Despite this, it appears that backstory methods win on more abstract policy-belief questions, and socialised QA wins on the harder sentiment question by blending opinions of demographics. It is worth pointing out that all four strategies comfortably beat the uniform ceiling across the board.
 
 ### INEQ5_i_W54
  
@@ -117,7 +150,7 @@ The main takeaway is that results are mixed, no clear winners emerge, and while 
 | backstory | 0.0366 |
 | backstory_socialised | 0.0287 |
  
-All models perform well under this paradigm, with distribution shapes largely matching under all strategies, and significant improvement against baselines. Interestingly, backstory_socialiased and the demographic listing baseline were the top performers here, showing no clear correlation between strategies and performance, implying all tasks perform well enough to capture ground truth up to baseline sampling noise and these differences between strategies might disappear over multiple runs (which I did not have time for). The only exception here is overconfidence on the backstory strategy for the 'contributes not too much option', where synthetic background context may be overpowering demographic information. 
+All models perform well under this paradigm, with distribution shapes largely matching the ground truth under all strategies. Interestingly, backstory_socialised and the baseline were the top performers here, showing no clear correlation between strategies and performance, implying all tasks perform well enough to capture ground truth up to sampling noise and these differences between strategies might disappear over multiple runs. The only exception here is overconfidence on the backstory strategy for the 'contributes not too much option', where synthetic background context may be overpowering demographic information. 
 
 ### INEQ8_c_W54
  
@@ -138,8 +171,8 @@ All models perform well under this paradigm, with distribution shapes largely ma
 | backstory | 0.0888 |
 | backstory_socialised | 0.1022 |
  
-Backstory methods dominate QA style demographic listing, implying that inclusion of motivating context for americans on lifestories might serve as better conditionals on beliefs for policy. For example working class americans often oppose wealth taxes due to implied violation of the principle of hard-work, something antithetical to what you might expect for lower income bracket citizens, something the demographic attribute itself might not capture.
- 
+Backstory methods dominate QA style demographic listing, implying that inclusion of motivating context for americans' lifestories might serve as better conditionals on beliefs for policy. For example working class americans often oppose wealth taxes due to implied violation of the principle of hard-work, where a reasonable intuitive belief might be that working class americans would be more critical of wealth inequality. This type of value-based nuance is something demgraphic attributes alone do not capture.
+
 ### ECON5_d_W54
  
 **Do you think the country's current economic conditions are helping or hurting people who are poor?**
@@ -167,11 +200,15 @@ The lower scores on this question across all strategies implies this question is
 
 ## 6. Next Steps
 
-The Obvious next step is running the existing code over 10 runs and report the mean and standard deviation of results. Keeping in theme with analysis next steps, decomposing results by demographic intersections rather than aggregating across all 100 personas would be a promsing inspection angle. This would allow validation that persona conditioning is producing distinct output variance - as there is no intersectional data distribution for survey response in the Pew ATP dataset, checking for accuracy to demographic would need to be done qualitatively initially. Assuming the conditioning is functioning correctly, building of a jacobian over all persona's response distribution against the average distribution would reveal output contributions more clearly and identify whether certain demographic cells are systematically harder to model and should be targetted for model debiasing etc.
+The Obvious next step is running the existing code over 10 runs and reporting the mean and standard deviation of results. This would significantly reduce guesswork in the results analysis.
 
-Continuing on the persona generation side, results seem to indicate that socialised persona generation strategies do produce notable differences under my proposed construction, therefore an extension to this mechanism to allow for inter-persona dialogue (having personas discuss the question before answering) as a preprocessing step might be promising. Alternatively, a more sophisticated social network model including clustering, small world properties, etc. would be a more managable next step. Moreover, the LoRa model used was designed to act as a single predictor over entire (sub)-populations conditioned on a single demographic, not making it a native candidate for multiple-attribute personas and modelling of individuals for persona discussion or socialising. Inclusion of separate model for discussion might therefore be preferable.
+Additionally, more comprehensive results analysis would allow a better understanding of the behaviour of persona generation and output conditioning. For example, decomposing results by persona would allow validation that persona conditioning is producing distinct output variance. It is worth noting that the Pew ATP dataset doesn't include intersectional ground truth over multiple demographics, meaning that this analysis would be more qualitative. Reporting per persona outputs could be done as a jacobian of output distributions differences relative to the averaged response distributions. This would reveal output contributions more clearly and identify whether certain demographic cells are systematically harder to model and should be targetted for model debiasing etc.
 
-Moreover, more advanced non-prompt engineering based strategies would be interesting to pursue, e.g. a RAG-based system using collections of datapoints per persona, allowing for large data corpuses to be used. Per-persona LoRa adapters might also produce stronger persona conditioned output variance, this would be particularly useful for underrepresented sub-populations.
+Continuing on the persona generation side, results seem to indicate that socialised persona generation strategies do produce notable differences under my proposed construction, therefore an extension to this mechanism to allow for inter-persona dialogue (having personas discuss the question before answering) as a preprocessing step might be promising. Alternatively, a more sophisticated social network model rather than a weighted complete graph could make social interaction dynamics more representative. My understanding is that social network simulation graphs require specialised properties such as clustering, and small-world. This would be a relatively easy next step.
+
+In terms of model selection, the finetuned model I selected used was designed to act as a single predictor over entire (sub)-populations conditioned on a single demographic, not making it a native candidate for multiple-attribute personas and modelling of individuals for persona discussion or socialising. Finetuning of a specialised model might therefore be promising, moreover, use of unsupervised diversity losses might allow per-persona variance while capturing the overall response distribution.
+
+Finally, experimentation with more advanced non-prompt-engineering based strategies would be interesting to pursue, e.g. a RAG-based system using collections of datapoints per persona, allowing for large data corpuses to be used. Per-persona LoRa adapters might also produce stronger persona conditioned output variance, this would be particularly useful for underrepresented sub-populations.
 
 # Appendix
 

@@ -65,7 +65,7 @@ class PersonaLLM:
 
     def _build_prompt(self, person: Person, question: str, options: List[str],
                       backstory: Optional[str] = None,
-                      neighbours: Optional[List[Person]] = None) -> str:
+                      neighbours: Optional[List[Person]] = None):
         """
         Build the full raw-completion prompt for a survey question.
 

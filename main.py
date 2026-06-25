@@ -50,15 +50,13 @@ def main(qs, strategies, pop_size=None, tranches=False):
     soc = Society(personas, q_dict)
 
     # Pre-generate backstories once if any strategy needs them
-    
     if any(s in strategies for s in ("backstory", "backstory_socialised")):
         print("Generating Persona Backstories (this will take a long time)...")
         soc.build_backstories(social="backstory_socialised" in strategies)
-
-    print("Finished Generating")
+        print("Finished Generating")
 
     print("Spinning up generator LLM...")
-    llm = PersonaLLM()
+    llm = PersonaLLM("mistralai/Mistral-7B-v0.1")
 
     from scipy.stats import wasserstein_distance as wd_fn
     results = {}
@@ -147,7 +145,7 @@ if __name__ == "__main__":
 
     args = argparse.Namespace(
         qs=["INEQ5_i_W54", "INEQ8_c_W54", "ECON5_d_W54"],
-        strategies=["backstory_socialised"],  # ["baseline", "socialised", "backstory", "backstory_socialised"],
+        strategies=["baseline"],  # ["baseline", "socialised", "backstory", "backstory_socialised"],
         pop_size=10,
         tranches=False,
     )
