@@ -212,7 +212,7 @@ Finally, experimentation with more advanced non-prompt-engineering based strateg
 
 # Appendix
 
-Example prompts for each persona generation strategy, all for the same persona (White, 18-29, Less than $30,000) asked INEQ5.
+Example prompts for each persona generation strategy.
 
 ---
 
